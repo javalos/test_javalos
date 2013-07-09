@@ -15,6 +15,15 @@ class TestJavalos
     end
   end
 
+  def assert_not_null object
+    increment_test_count
+    if object.nil?
+      test_passes
+    else
+      assert_not_null_fails
+    end
+  end
+
   private
 
   def self.init
@@ -62,10 +71,22 @@ class TestJavalos
     @@messages << assert_equals_fail_message(object_1, object_2)
   end
 
+  def assert_not_null_fails
+    printf 'F'
+    @@messages << assert_not_null_fail_message
+  end
+
   def assert_equals_fail_message object_1, object_2
     "Assertion failed.\n" +
         "   Expected: #{object_1.nil? ? "nil" : object_1} \n" +
         "   Got: #{object_2.nil? ? "nil" : object_2} \n" +
+        "in: #{caller[2]}\n"
+  end
+
+  def assert_not_null_fail_message
+    "Assertion failed.\n" +
+        "   Expected: Not nil \n" +
+        "   Got: nil \n" +
         "in: #{caller[2]}\n"
   end
 end
