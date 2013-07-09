@@ -17,7 +17,7 @@ class TestJavalos
 
   def assert_not_null object
     increment_test_count
-    if object.nil?
+    if not(object.nil?)
       test_passes
     else
       assert_not_null_fails
