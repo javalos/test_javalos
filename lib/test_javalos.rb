@@ -78,8 +78,8 @@ class TestJavalos
 
   def assert_equals_fail_message object_1, object_2
     "Assertion failed.\n" +
-        "   Expected: #{object_1.nil? ? "nil" : object_1} \n" +
-        "   Got: #{object_2.nil? ? "nil" : object_2} \n" +
+        "   Expected: <#{object_1.class.name}> #{object_1.nil? ? "nil" : object_1} \n" +
+        "   Got: <#{object_2.class.name}> #{object_2.nil? ? "nil" : object_2} \n" +
         "in: #{caller[2]}\n"
   end
 
