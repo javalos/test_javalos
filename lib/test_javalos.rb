@@ -24,24 +24,66 @@ class TestJavalos
     end
   end
 
+  def before_all
+  end
+
+  def after_all
+  end
+
+  def before_each
+  end
+
+  def after_each
+  end
+
   private
 
   def self.init
+    @@errors = Array.new
     @@messages = Array.new
     @@count_tests = 0
   end
 
   def self.run_tests
     classes = ObjectSpace.each_object(Class).to_a
-    test_classes = classes.find_all{|item| item.name =~ /(.*)Test/ }
+    test_classes = classes.find_all{|object_class| object_class.name =~ /(.*)Test$/ and object_class < TestJavalos }
     test_classes.each do |test_class|
-      instance = test_class.new
-      test_class.instance_methods.grep(/test/) { |method| instance.send(method)}
+      run_tests_for test_class
+    end
+  end
+
+  def self.run_tests_for test_class
+    instance = test_class.new
+    instance.before_all
+    test_class.instance_methods.grep(/^test/).each do |method|
+      run_method_test_with instance, method
+    end
+    instance.after_all    
+  end
+
+  def self.run_method_test_with instance, method
+    begin
+      instance.before_each
+      instance.send(method)
+    rescue => exception
+      printf 'X'
+      @@errors << exception
+    ensure
+      instance.after_each
     end
   end
 
   def self.print_messages
     puts ""
+    if @@errors.length > 0
+      puts "\nErrors:\n"
+      @@errors.each_with_index do |error, index|
+        puts ""
+        puts (index + 1).to_s + ") " + error.message
+        puts error.backtrace
+      end
+      puts ""
+    end
     if @@messages.length > 0
       puts "\nFailures:\n"
       @@messages.each_with_index do |message, index|
@@ -50,7 +92,10 @@ class TestJavalos
       end
       puts ""
     end
-    puts "#{@@count_tests} tests, #{@@count_tests - @@messages.length} passed, #{@@messages.length} failed"
+    puts "#{@@count_tests} assertions, " +
+          "#{@@count_tests - @@messages.length} passed, " + 
+          "#{@@messages.length} failed, " +
+          "#{@@errors.length} errors"
     puts ""
   end
 
