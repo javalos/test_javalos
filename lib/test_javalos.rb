@@ -7,7 +7,7 @@ class TestJavalos
   end
 
   def assert_equals object_1, object_2
-    increment_test_count
+    increment_total_assertions
     if are_equals? object_1, object_2
       test_passes
     else
@@ -16,7 +16,7 @@ class TestJavalos
   end
 
   def assert_not_null object
-    increment_test_count
+    increment_total_assertions
     if not(object.nil?)
       test_passes
     else
@@ -41,7 +41,7 @@ class TestJavalos
   def self.init
     @@errors = Array.new
     @@messages = Array.new
-    @@count_tests = 0
+    @@total_assertions = 0
   end
 
   def self.run_tests
@@ -66,11 +66,15 @@ class TestJavalos
       instance.before_each
       instance.send(method)
     rescue => exception
-      printf 'X'
-      @@errors << exception
+      test_error_by exception
     ensure
       instance.after_each
     end
+  end
+
+  def self.test_error_by exception
+    printf 'E'
+    @@errors << exception
   end
 
   def self.print_messages
@@ -92,15 +96,15 @@ class TestJavalos
       end
       puts ""
     end
-    puts "#{@@count_tests} assertions, " +
-          "#{@@count_tests - @@messages.length} passed, " + 
+    puts "#{@@total_assertions} assertions, " +
+          "#{@@total_assertions - @@messages.length} passed, " + 
           "#{@@messages.length} failed, " +
-          "#{@@errors.length} errors"
+          "with #{@@errors.length} errors"
     puts ""
   end
 
-  def increment_test_count
-    @@count_tests = @@count_tests + 1
+  def increment_total_assertions
+    @@total_assertions = @@total_assertions + 1
   end
 
   def are_equals? object_1, object_2
